@@ -8,8 +8,8 @@ import com.odopBackend.odopShi_RestApi.repository.ProductRepository;
 import com.odopBackend.odopShi_RestApi.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.core.Authentication;
-// import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,15 +50,16 @@ public class ProductService {
 
     public ResponseEntity<String> addProduct( Product product) {
 
-        // Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
 
-        // String userName= authentication.getName();
-        // Users admin = userRepository.findByUsername(userName);
+        String userName= authentication.getName();
+        Users admin = userRepository.findByUsername(userName);
        // Product pro=new Product();
        try {
             productRepository.save(product);
             ProductOwnerShip productOwnerShip = new ProductOwnerShip();
             productOwnerShip.setProduct(product);
+            productOwnerShip.setUser(admin);
             productOwnerShipRepository.save(productOwnerShip);
             return new ResponseEntity<>("Product added successfully", HttpStatus.OK);
         } catch (Exception e) {
