@@ -4,6 +4,7 @@ import com.odopBackend.odopShi_RestApi.Entity.Product;
 import com.odopBackend.odopShi_RestApi.repository.ProductRepository;
 import com.odopBackend.odopShi_RestApi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +22,15 @@ public class ProductController {
     private ProductRepository repository;
 
     @PostMapping("/addProduct")
-    public ResponseEntity<String> addProductToInventory(@ModelAttribute Product product, @RequestParam("image") MultipartFile file) {
-        return productService.addProduct( product,file);
-
+    public ResponseEntity<String> addProductToInventory(@ModelAttribute Product product, @RequestParam("data") MultipartFile file) {
+        try {
+            byte[] imageData = file.getBytes();
+            product.setImage(imageData);
+            return productService.addProduct(product);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Error uploading image", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 //    @PostMapping("/upload")

@@ -48,35 +48,23 @@ public class ProductService {
 //    }
 
 
-    public ResponseEntity<String> addProduct( Product product, MultipartFile file) {
+    public ResponseEntity<String> addProduct( Product product) {
 
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
 
         String userName= authentication.getName();
         Users admin = userRepository.findByUsername(userName);
        // Product pro=new Product();
-        try {
-            if (!file.isEmpty()) {
-                byte[] imageData = file.getBytes();
-
-                product.setImage(imageData);
-                productRepository.save(product);
-                ProductOwnerShip productOwnerShip=new ProductOwnerShip();
-                productOwnerShip.setProduct(product);
-                productOwnerShip.setUser(admin);
-                productOwnerShipRepository.save(productOwnerShip);
-            } else {
-                return new ResponseEntity<>("Error: No image file uploaded", HttpStatus.BAD_REQUEST);
-            }
-
-            // Process and save the product with the image in your database
-
-
-
+       try {
+            productRepository.save(product);
+            ProductOwnerShip productOwnerShip = new ProductOwnerShip();
+            productOwnerShip.setProduct(product);
+            productOwnerShip.setUser(admin);
+            productOwnerShipRepository.save(productOwnerShip);
             return new ResponseEntity<>("Product added successfully", HttpStatus.OK);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Error uploading image", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error adding product", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
